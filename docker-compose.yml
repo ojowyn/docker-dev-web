@@ -1,0 +1,38 @@
+version: "3.7"
+services:
+  www:
+    build:
+      context: ./apache
+    restart: always
+    volumes:
+      - ./www:/var/www/html
+      - ./vhost:/usr/local/apache2/conf/extra/virtualhost:ro
+    ports:
+      - 80:80
+    networks:
+      - backend
+  php:
+    build:
+      context: ./php
+    restart: always
+    volumes:
+      - ./www:/var/www/html
+      - ./php/conf/999-config.ini:/usr/local/etc/php/conf.d/999-config.ini:ro
+    ports:
+      - 9000:9000
+    networks:
+      - backend
+  mysql:
+    build:
+      context: ./mysql
+    restart: always
+    volumes:
+      - ./mysql/data:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+    ports:
+      - 3306:3306
+    networks:
+      - backend
+networks:
+  backend:
